@@ -1,0 +1,39 @@
+.project {
+  background-color: #ddd;
+  margin: 5px 0;
+  border-radius: 5px;
+  padding: 10px;
+  color: rgba(0, 0, 0, 0.768);
+}
+.project .project_title {
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: capitalize;
+  word-wrap: break-word;
+  text-align: center;
+  color: inherit;
+}
+.project .project_desc {
+  border: 1px solid #ddd;
+  margin: 5px 0px;
+  color: inherit;
+}
+.project .project_icons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: end;
+  margin-top: 10px;
+}
+.project .project_icons button {
+  border-width: 0;
+  outline-width: 0;
+  cursor: pointer;
+  margin: 0px 2px;
+  background-color: initial;
+}
+.project .project_icons button.delete {
+  color: rgb(247, 44, 8);
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"ProjectStatus.d.ts","sourceRoot":"","sources":["../../../src/scripts/store/ProjectStatus.ts"],"names":[],"mappings":"AAEA,cAAM,YAAY;;IAEd,OAAO,CAAC,MAAM,CAAC,SAAS,CAAe;IACvC,OAAO,CAAC,SAAS,CAAkB;IACnC,OAAO,CAAC,QAAQ,CAAa;WAMd,WAAW;IAcnB,aAAa,CAAC,KAAK,EAAE,MAAM,EAAE,WAAW,EAAE,MAAM;CAU1D;AAED,eAAO,MAAM,YAAY,cAA6B,CAAC"}
