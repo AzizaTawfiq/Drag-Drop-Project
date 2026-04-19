@@ -2,12 +2,14 @@ import { projectState } from './../store/ProjectState.js';
 import type { ProjectRules } from '../store/ProjectRules.js';
 import { Base } from './Base.js';
 import { autoBind } from '../decorators/autoBind.js';
+import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
 export class Project extends Base<HTMLDivElement> {
     private _project: ProjectRules;
     constructor(projectsListId:string,project:ProjectRules) {
         super('project-item', projectsListId, true, project.id);
         this._project = project;
         this._renderProject();
+        this._editProject();
         this._deleteProject();
         this._runDragging();
     }
@@ -33,12 +35,60 @@ export class Project extends Base<HTMLDivElement> {
         }
     }
 
+    @autoBind
+    private _handleEditProject() : void {
+        const titleValue = prompt('Enter project title:', this._project.title);
+        if (titleValue === null) return;
+
+        const descValue = prompt('Enter project description:', this._project.desc);
+        if (descValue === null) return;
+
+        const trimmedTitle = titleValue.trim();
+        const trimmedDesc = descValue.trim();
+
+        if (!this._validateInputsValues(trimmedTitle, trimmedDesc)) {
+            return;
+        }
+
+        projectState.updateProject(this._project.id, trimmedTitle, trimmedDesc);
+    }
+
     /**
      * @desc Attaches an event listener to the delete button of the project item, allowing users to delete the project when the button is clicked.
      */
+    private _editProject() : void {
+        const editBtn = this.element.querySelector('.edit')! as HTMLButtonElement;
+        editBtn.addEventListener('click', this._handleEditProject);
+    }
+
     private _deleteProject() : void {
         const deleteBtn = this.element.querySelector('.delete')! as HTMLButtonElement;
         deleteBtn.addEventListener('click', this._handleDeleteProject);
+}
+
+private _validateInputsValues(titleValue: string, descValue: string) : boolean {
+    const [titleInputRule, descInputRule] = assignValidateInputs(titleValue, descValue);
+    if (!titleInputRule || !descInputRule) {
+        return false;
+    }
+    const titleErrorMessage = handleValidationErrors(titleInputRule);
+    const descErrorMessage = handleValidationErrors(descInputRule);
+    const popupContainer = document.getElementById('popup_container')! as HTMLDivElement;
+    const descPopup = popupContainer.querySelector('.desc_popup')! as HTMLParagraphElement;
+
+    if (titleErrorMessage.length) {
+        descPopup.textContent = titleErrorMessage;
+        popupContainer.classList.add('visible_popup');
+        return false;
+    }
+
+    if (descErrorMessage.length) {
+        descPopup.textContent = descErrorMessage;
+        popupContainer.classList.add('visible_popup');
+        return false;
+    }
+
+    return true;
 }
 /**
  * @desc Attaches event listeners for drag-and-drop functionality, enabling the project item to be draggable and allowing users to move it between different project lists.

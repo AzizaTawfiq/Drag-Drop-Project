@@ -30,6 +30,15 @@ class ProjectState {
         this._runListeners();
         localStorage.setItem("projects", JSON.stringify(this._projects));
     }
+    updateProject(projectId, title, desc) {
+        const project = this._projects.find((item) => item.id === projectId);
+        if (!project)
+            return;
+        project.title = title;
+        project.desc = desc;
+        this._runListeners();
+        localStorage.setItem("projects", JSON.stringify(this._projects));
+    }
     _runListeners() {
         for (const listener of this._listeners) {
             listener(this._projects.slice());

@@ -12,3 +12,20 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+ .edit-list-btn{
+     cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #0079bf;
+  }
+
+  .delete-list-btn{
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      margin-left: 5px;
+      color: red;
+  }

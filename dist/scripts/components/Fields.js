@@ -10,8 +10,14 @@ import { assignValidateInputs, handleValidationErrors } from '../utils/validatio
 import { Base } from './Base.js';
 import { listState } from '../store/ListState.js';
 export class Fields extends Base {
+    _listSelect;
     constructor() {
         super('fields', 'app', true, 'form');
+        this._listSelect = this.element.querySelector('#project-status');
+        this._renderListOptions(listState.lists);
+        listState.pushListener((lists) => {
+            this._renderListOptions(lists);
+        });
         this._addProject();
     }
     _addProject() {
@@ -19,7 +25,7 @@ export class Fields extends Base {
     }
     _handleAddProject(event) {
         event.preventDefault();
-        const [titleInput, descInput] = this._targetInputs();
+        const [titleInput, descInput, statusInput] = this._targetInputs();
         const [titleValue, descValue] = this._getInputsValues(titleInput, descInput);
         this._validateInputsValues(titleValue, descValue);
         if (this._validateInputsValues(titleValue, descValue)) {
@@ -27,16 +33,17 @@ export class Fields extends Base {
                 id: Math.random().toString(),
                 title: titleValue,
                 desc: descValue,
-                status: (listState.lists.length > 0 ? listState.lists[0] : 'Initial')
+                status: statusInput.value || this._getDefaultList(listState.lists)
             };
             projectState.createProject(payload);
-            this._clearInputs(titleInput, descInput);
+            this._clearInputs(titleInput, descInput, statusInput);
         }
         return;
     }
-    _clearInputs(titleInput, descInput) {
+    _clearInputs(titleInput, descInput, statusInput) {
         titleInput.value = '';
         descInput.value = '';
+        statusInput.value = this._getDefaultList(listState.lists);
     }
     _getInputsValues(titleInput, descInput) {
         const titleValue = titleInput.value;
@@ -46,7 +53,21 @@ export class Fields extends Base {
     _targetInputs() {
         const titleInput = document.getElementById("title");
         const descInput = document.getElementById("desc");
-        return [titleInput, descInput];
+        const statusInput = document.getElementById("project-status");
+        return [titleInput, descInput, statusInput];
+    }
+    _renderListOptions(lists) {
+        this._listSelect.innerHTML = '';
+        for (const list of lists) {
+            const option = document.createElement('option');
+            option.value = list;
+            option.textContent = list;
+            this._listSelect.append(option);
+        }
+        this._listSelect.value = this._getDefaultList(lists);
+    }
+    _getDefaultList(lists) {
+        return lists.includes('Initial') ? 'Initial' : (lists[0] ?? 'Initial');
     }
     _validateInputsValues(titleValue, descValue) {
         const [titleInputRule, descInputRule] = assignValidateInputs(titleValue, descValue);

@@ -16,7 +16,8 @@ form {
       font-weight: 600;
       text-transform: capitalize;
     }
-    input {
+    input,
+    select {
       width: 100%;
       padding: 10px;
       border-radius: $small-r;

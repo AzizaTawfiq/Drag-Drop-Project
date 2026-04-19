@@ -11,6 +11,7 @@ declare class ProjectState {
     pushListener(listener: Listener): void;
     createProject(data: ProjectRules): void;
     deleteProject(projectId: string): void;
+    updateProject(projectId: string, title: string, desc: string): void;
     private _runListeners;
     changeProjectStatus(projectId: string, newStatus: ProjectStatus): void;
     renameStatus(oldStatus: string, newStatus: string): void;

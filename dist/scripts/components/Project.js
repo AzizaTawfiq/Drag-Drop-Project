@@ -7,12 +7,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { projectState } from './../store/ProjectState.js';
 import { Base } from './Base.js';
 import { autoBind } from '../decorators/autoBind.js';
+import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
 export class Project extends Base {
     _project;
     constructor(projectsListId, project) {
         super('project-item', projectsListId, true, project.id);
         this._project = project;
         this._renderProject();
+        this._editProject();
         this._deleteProject();
         this._runDragging();
     }
@@ -27,9 +29,48 @@ export class Project extends Base {
             projectState.deleteProject(this._project.id);
         }
     }
+    _handleEditProject() {
+        const titleValue = prompt('Enter project title:', this._project.title);
+        if (titleValue === null)
+            return;
+        const descValue = prompt('Enter project description:', this._project.desc);
+        if (descValue === null)
+            return;
+        const trimmedTitle = titleValue.trim();
+        const trimmedDesc = descValue.trim();
+        if (!this._validateInputsValues(trimmedTitle, trimmedDesc)) {
+            return;
+        }
+        projectState.updateProject(this._project.id, trimmedTitle, trimmedDesc);
+    }
+    _editProject() {
+        const editBtn = this.element.querySelector('.edit');
+        editBtn.addEventListener('click', this._handleEditProject);
+    }
     _deleteProject() {
         const deleteBtn = this.element.querySelector('.delete');
         deleteBtn.addEventListener('click', this._handleDeleteProject);
+    }
+    _validateInputsValues(titleValue, descValue) {
+        const [titleInputRule, descInputRule] = assignValidateInputs(titleValue, descValue);
+        if (!titleInputRule || !descInputRule) {
+            return false;
+        }
+        const titleErrorMessage = handleValidationErrors(titleInputRule);
+        const descErrorMessage = handleValidationErrors(descInputRule);
+        const popupContainer = document.getElementById('popup_container');
+        const descPopup = popupContainer.querySelector('.desc_popup');
+        if (titleErrorMessage.length) {
+            descPopup.textContent = titleErrorMessage;
+            popupContainer.classList.add('visible_popup');
+            return false;
+        }
+        if (descErrorMessage.length) {
+            descPopup.textContent = descErrorMessage;
+            popupContainer.classList.add('visible_popup');
+            return false;
+        }
+        return true;
     }
     _runDragging() {
         this.element.addEventListener('dragstart', this._handleDragStart);
@@ -47,6 +88,9 @@ export class Project extends Base {
 __decorate([
     autoBind
 ], Project.prototype, "_handleDeleteProject", null);
+__decorate([
+    autoBind
+], Project.prototype, "_handleEditProject", null);
 __decorate([
     autoBind
 ], Project.prototype, "_handleDragStart", null);

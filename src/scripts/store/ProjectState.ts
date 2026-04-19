@@ -67,6 +67,16 @@ class ProjectState {
         
     }
 
+    public updateProject(projectId: string, title: string, desc: string) : void {
+        const project = this._projects.find((item: ProjectRules) => item.id === projectId);
+        if (!project) return;
+
+        project.title = title;
+        project.desc = desc;
+        this._runListeners();
+        localStorage.setItem("projects", JSON.stringify(this._projects));
+    }
+
     /**
      * @desc move project to another status
     */

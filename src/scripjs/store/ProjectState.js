@@ -64,6 +64,18 @@ var ProjectState = /*#__PURE__*/function () {
       this._runListeners();
       localStorage.setItem("projects", JSON.stringify(this._projects));
     }
+  }, {
+    key: "updateProject",
+    value: function updateProject(projectId, title, desc) {
+      var project = this._projects.find(function (item) {
+        return item.id === projectId;
+      });
+      if (!project) return;
+      project.title = title;
+      project.desc = desc;
+      this._runListeners();
+      localStorage.setItem("projects", JSON.stringify(this._projects));
+    }
 
     /**
      * @desc move project to another status
@@ -97,6 +109,42 @@ var ProjectState = /*#__PURE__*/function () {
       });
       if (project && project.status !== newStatus) {
         project.status = newStatus;
+        this._runListeners();
+        localStorage.setItem("projects", JSON.stringify(this._projects));
+      }
+    }
+  }, {
+    key: "renameStatus",
+    value: function renameStatus(oldStatus, newStatus) {
+      var changed = false;
+      var _iterator2 = _createForOfIteratorHelper(this._projects),
+        _step2;
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var p = _step2.value;
+          if (p.status === oldStatus) {
+            p.status = newStatus;
+            changed = true;
+          }
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+      if (changed) {
+        this._runListeners();
+        localStorage.setItem("projects", JSON.stringify(this._projects));
+      }
+    }
+  }, {
+    key: "deleteProjectsByStatus",
+    value: function deleteProjectsByStatus(status) {
+      var originalLength = this._projects.length;
+      this._projects = this._projects.filter(function (p) {
+        return p.status !== status;
+      });
+      if (this._projects.length !== originalLength) {
         this._runListeners();
         localStorage.setItem("projects", JSON.stringify(this._projects));
       }
