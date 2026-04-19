@@ -6,8 +6,15 @@ import { assignValidateInputs, handleValidationErrors } from '../utils/validatio
 import { Base } from './Base.js';
 import { listState } from '../store/ListState.js';
 export class Fields extends Base<HTMLFormElement> {
+    private _listSelect: HTMLSelectElement;
+
     constructor() {
         super('fields', 'app', true, 'form');
+        this._listSelect = this.element.querySelector('#project-status') as HTMLSelectElement;
+        this._renderListOptions(listState.lists);
+        listState.pushListener((lists: string[]) => {
+            this._renderListOptions(lists);
+        });
         this._addProject();
     }
 
@@ -24,7 +31,7 @@ export class Fields extends Base<HTMLFormElement> {
     @autoBind
     private _handleAddProject (event: Event)  : void  {
         event.preventDefault();
-     const [titleInput, descInput ] = this._targetInputs();
+     const [titleInput, descInput, statusInput ] = this._targetInputs();
       const [titleValue, descValue ] = this._getInputsValues(titleInput!, descInput!);
       this._validateInputsValues(titleValue, descValue);
       if(this._validateInputsValues(titleValue, descValue)) {
@@ -32,17 +39,18 @@ export class Fields extends Base<HTMLFormElement> {
             id: Math.random().toString(),
             title: titleValue,
             desc: descValue,
-            status: (listState.lists.length > 0 ? listState.lists[0] : 'Initial') as string
+            status: statusInput.value || this._getDefaultList(listState.lists)
         }
         projectState.createProject(payload);
-        this._clearInputs(titleInput, descInput);      
+        this._clearInputs(titleInput, descInput, statusInput);      
       } 
       return;
      
     }
-    private _clearInputs(titleInput: HTMLInputElement, descInput: HTMLInputElement) {
+    private _clearInputs(titleInput: HTMLInputElement, descInput: HTMLInputElement, statusInput: HTMLSelectElement) {
         titleInput.value = '';
         descInput.value = '';
+        statusInput.value = this._getDefaultList(listState.lists);
     }
 
     /**
@@ -61,10 +69,29 @@ export class Fields extends Base<HTMLFormElement> {
      * @desc get project inputs
      * @return inputs [title, desc] : [HTMLInputElement, HTMLInputElement]
      */
-    private _targetInputs() : [HTMLInputElement, HTMLInputElement] {
+    private _targetInputs() : [HTMLInputElement, HTMLInputElement, HTMLSelectElement] {
     const titleInput = document.getElementById("title")! as HTMLInputElement;
     const descInput = document.getElementById("desc")! as HTMLInputElement;
-    return [titleInput, descInput];
+    const statusInput = document.getElementById("project-status")! as HTMLSelectElement;
+    return [titleInput, descInput, statusInput];
+    }
+
+    private _renderListOptions(lists: string[]) : void {
+        this._listSelect.innerHTML = '';
+
+        for (const list of lists) {
+            const option = document.createElement('option');
+            option.value = list;
+            option.textContent = list;
+            option.style.textTransform = 'capitalize';
+            this._listSelect.append(option);
+        }
+
+        this._listSelect.value = this._getDefaultList(lists);
+    }
+
+    private _getDefaultList(lists: string[]) : string {
+        return lists.includes('Initial') ? 'Initial' : (lists[0] ?? 'Initial');
     }
 
     /**

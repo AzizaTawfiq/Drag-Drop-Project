@@ -62,6 +62,7 @@ export class Fields extends Base {
             const option = document.createElement('option');
             option.value = list;
             option.textContent = list;
+            option.style.textTransform = 'capitalize';
             this._listSelect.append(option);
         }
         this._listSelect.value = this._getDefaultList(lists);
