@@ -13,6 +13,8 @@ declare class ProjectState {
     deleteProject(projectId: string): void;
     private _runListeners;
     changeProjectStatus(projectId: string, newStatus: ProjectStatus): void;
+    renameStatus(oldStatus: string, newStatus: string): void;
+    deleteProjectsByStatus(status: string): void;
 }
 export declare const projectState: ProjectState;
 export {};

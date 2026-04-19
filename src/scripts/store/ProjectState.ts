@@ -89,5 +89,28 @@ public changeProjectStatus(projectId: string, newStatus: ProjectStatus) : void {
         localStorage.setItem("projects", JSON.stringify(this._projects));
     }
 }
+
+public renameStatus(oldStatus: string, newStatus: string): void {
+    let changed = false;
+    for (const p of this._projects) {
+        if (p.status === oldStatus) {
+            p.status = newStatus;
+            changed = true;
+        }
+    }
+    if (changed) {
+        this._runListeners();
+        localStorage.setItem("projects", JSON.stringify(this._projects));
+    }
+}
+
+public deleteProjectsByStatus(status: string): void {
+    const originalLength = this._projects.length;
+    this._projects = this._projects.filter(p => p.status !== status);
+    if (this._projects.length !== originalLength) {
+        this._runListeners();
+        localStorage.setItem("projects", JSON.stringify(this._projects));
+    }
+}
 }
 export const projectState = ProjectState.getInstance();

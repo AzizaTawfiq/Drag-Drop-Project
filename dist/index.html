@@ -26,10 +26,37 @@
         <button class="btn">add project</button>
       </form>
     </template>
+    <template id="add-list">
+      <div id="add-list-wrapper" class="projects add-list-container">
+        <div id="add-list-button" class="add-list-button">
+          <i class="bx bx-plus"></i>
+          <span>Add another list</span>
+        </div>
+        <form id="add-list-form" class="add-list-form">
+          <input
+            class="new-list-name"
+            type="text"
+            placeholder="Enter list title..."
+          />
+          <div class="add-list-controls">
+            <button class="btn add-list-btn">Add list</button>
+            <i class="bx bx-x close-form"></i>
+          </div>
+        </form>
+      </div>
+    </template>
     <template id="projects-list">
-      <div class="projects">
+      <div class="projects lists-actions">
         <div class="title-header">
           <h2 class="title"></h2>
+          <div class="list-actions">
+            <button class="edit-list edit-list-btn">
+              <i class="bx bx-edit"></i>
+            </button>
+            <button class="delete-list delete-list-btn">
+              <i class="bx bx-trash"></i>
+            </button>
+          </div>
         </div>
         <ul class="projects-list"></ul>
       </div>

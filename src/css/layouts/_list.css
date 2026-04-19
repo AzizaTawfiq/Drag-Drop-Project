@@ -1,0 +1,106 @@
+.add-list-container {
+  -webkit-box-ordinal-group: 100;
+      -ms-flex-order: 99;
+          order: 99;
+  min-width: 250px;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  background-color: rgba(255, 255, 255, 0.24);
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+}
+
+.add-list-button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  cursor: pointer;
+  color: white;
+  font-weight: 500;
+}
+.add-list-button .bx-plus {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.add-list-form {
+  display: none;
+  padding: 0;
+  min-width: unset;
+  max-width: unset;
+  background: transparent;
+  width: 100%;
+  margin-top: 0;
+}
+.add-list-form .new-list-name {
+  width: 100%;
+  padding: 8px;
+  border-radius: 3px;
+  border: none;
+  margin-bottom: 5px;
+  outline: none;
+  background: white;
+  color: black;
+}
+.add-list-form .add-list-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 5px;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.add-list-form .add-list-controls .add-list-btn {
+  background-color: #0079bf;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-top: 0;
+  width: auto;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.add-list-form .add-list-controls .close-form {
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
+.lists-actions .title-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.lists-actions .title-header .title {
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+}
+.lists-actions .title-header .edit-list-btn {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #0079bf;
+}
+.lists-actions .title-header .delete-list-btn {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  margin-left: 5px;
+  color: red;
+}

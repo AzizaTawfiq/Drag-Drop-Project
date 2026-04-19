@@ -1,7 +1,7 @@
 import { Base } from './Base.js';
 export declare class ProjectsList extends Base<HTMLDivElement> {
     private status;
-    constructor(status: 'Initial' | 'Active' | 'Finished');
+    constructor(status: string);
     private _renderProjectsList;
     private _renderProjects;
     private _showProjectInDom;

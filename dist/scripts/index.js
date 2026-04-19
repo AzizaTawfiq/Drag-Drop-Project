@@ -1,9 +1,19 @@
 import { Fields } from './components/Fields.js';
 import { Popup } from './components/popup.js';
 import { ProjectsList } from './components/ProjectsList.js';
+import { ListForm } from './components/ListForm.js';
+import { listState } from './store/ListState.js';
 new Fields();
-new ProjectsList('Initial');
-new ProjectsList('Active');
-new ProjectsList('Finished');
+new ListForm();
 new Popup();
+let activeLists = [];
+listState.pushListener((lists) => {
+    for (const list of activeLists) {
+        list.element.remove();
+    }
+    activeLists = [];
+    for (const listName of lists) {
+        activeLists.push(new ProjectsList(listName));
+    }
+});
 //# sourceMappingURL=index.js.map

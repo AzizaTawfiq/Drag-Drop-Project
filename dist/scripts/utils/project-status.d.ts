@@ -1,6 +1,2 @@
-export declare enum ProjectStatus {
-    Initial = "Initial",
-    Active = "Active",
-    Finished = "Finished"
-}
+export type ProjectStatus = string;
 //# sourceMappingURL=project-status.d.ts.map

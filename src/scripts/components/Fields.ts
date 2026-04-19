@@ -1,9 +1,10 @@
 import { autoBind } from '../decorators/autoBind.js';
 import type { ProjectRules } from '../store/ProjectRules.js';
 import { projectState } from '../store/ProjectState.js';
-import { ProjectStatus } from '../utils/project-status.js';
+import type { ProjectStatus } from '../utils/project-status.js';
 import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
 import { Base } from './Base.js';
+import { listState } from '../store/ListState.js';
 export class Fields extends Base<HTMLFormElement> {
     constructor() {
         super('fields', 'app', true, 'form');
@@ -31,7 +32,7 @@ export class Fields extends Base<HTMLFormElement> {
             id: Math.random().toString(),
             title: titleValue,
             desc: descValue,
-            status: ProjectStatus.Initial
+            status: (listState.lists.length > 0 ? listState.lists[0] : 'Initial') as string
         }
         projectState.createProject(payload);
         this._clearInputs(titleInput, descInput);      

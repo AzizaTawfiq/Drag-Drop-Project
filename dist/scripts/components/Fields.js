@@ -6,9 +6,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { autoBind } from '../decorators/autoBind.js';
 import { projectState } from '../store/ProjectState.js';
-import { ProjectStatus } from '../utils/project-status.js';
 import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
 import { Base } from './Base.js';
+import { listState } from '../store/ListState.js';
 export class Fields extends Base {
     constructor() {
         super('fields', 'app', true, 'form');
@@ -27,7 +27,7 @@ export class Fields extends Base {
                 id: Math.random().toString(),
                 title: titleValue,
                 desc: descValue,
-                status: ProjectStatus.Initial
+                status: (listState.lists.length > 0 ? listState.lists[0] : 'Initial')
             };
             projectState.createProject(payload);
             this._clearInputs(titleInput, descInput);

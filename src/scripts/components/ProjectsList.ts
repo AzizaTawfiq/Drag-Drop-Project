@@ -1,13 +1,14 @@
 import { Base } from './Base.js';
 import { projectState } from '../store/ProjectState.js';
 import type { ProjectRules } from '../store/ProjectRules.js';
-import { ProjectStatus } from '../utils/project-status.js';
 import { Project } from './Project.js';
 import { autoBind } from '../decorators/autoBind.js';
+import { listState } from '../store/ListState.js';
+
 export class ProjectsList extends Base<HTMLDivElement> {
    
-    constructor( private status: 'Initial' | 'Active' | 'Finished') {
-        super('projects-list', 'app', false, `${status.toLowerCase()}-projects`);
+    constructor( private status: string) {
+        super('projects-list', 'app', false, `${status.toLowerCase().replace(/\s+/g,'-')}-projects`);
         this._renderProjectsList();
         if(JSON.parse(localStorage.getItem("projects")!)) {
             const localStorageProjects: ProjectRules[] = JSON.parse(localStorage.getItem("projects")!);
@@ -26,8 +27,24 @@ export class ProjectsList extends Base<HTMLDivElement> {
   private _renderProjectsList() : void {
    const title = this.element.querySelector('.title')! as HTMLHeadingElement;
    const list = this.element.querySelector('ul')! as HTMLUListElement;
-   list.id = `${this.status.toLowerCase()}-list`;
-   title.textContent = `${this.status} Projects`;
+   list.id = `${this.status.toLowerCase().replace(/\s+/g,'-')}-list`;
+   title.textContent = `${this.status}`;
+
+   const editBtn = this.element.querySelector('.edit-list') as HTMLButtonElement;
+   const deleteBtn = this.element.querySelector('.delete-list') as HTMLButtonElement;
+
+   editBtn.addEventListener('click', () => {
+       const newName = prompt('Enter new list name:', this.status);
+       if (newName && newName.trim().length > 0 && newName !== this.status) {
+           listState.editList(this.status, newName.trim());
+       }
+   });
+
+   deleteBtn.addEventListener('click', () => {
+       if (confirm(`Are you sure you want to delete the '${this.status}' list and all its projects?`)) {
+           listState.deleteList(this.status);
+       }
+   });
   } 
   
     /**
@@ -36,12 +53,13 @@ export class ProjectsList extends Base<HTMLDivElement> {
      * @return void
      */
     private _renderProjects(projects: ProjectRules[]) : void {
-        const projectsList = document.getElementById(`${this.status.toLowerCase()}-list`)! as HTMLDivElement;
-        projectsList.innerHTML = '';
-        for (const project of projects) {
-            new Project(`${this.status.toLowerCase()}-list`, project);
-           /* const content = this._createProjectElement(project);
-              projectsList.innerHTML += content; */
+        const listId = `${this.status.toLowerCase().replace(/\s+/g,'-')}-list`;
+        const projectsList = document.getElementById(listId)! as HTMLDivElement;
+        if(projectsList) {
+            projectsList.innerHTML = '';
+            for (const project of projects) {
+                new Project(listId, project);
+            }
         }
     }
 
@@ -54,20 +72,7 @@ export class ProjectsList extends Base<HTMLDivElement> {
             this._renderProjects(filteredProjects);
     }
 
-    /**
-     * @desc Creates a project element and appends it to the projects list in the DOM.
-     * @param project : ProjectRules
-     * @return void
-     */
-   /*  private _createProjectElement(project: ProjectRules) {
-        const content = ` 
-        <div class="project" draggable="true" >
-        <h2 class="project_title" id="project_title">${project.title}</h2>
-        <p class="project_desc" id="project_desc">${project.desc}</p>
-        </div>
-        `
-        return content
-    } */
+   
 
     /**
      * @desc Filters the projects based on the status (Initial, Active, Finished) and returns the filtered projects array.
@@ -76,16 +81,7 @@ export class ProjectsList extends Base<HTMLDivElement> {
      */
 
     private _filterProjectsByStatus(projects: ProjectRules[]) : ProjectRules[] {
-        const filteredProjects= projects.filter(project => {
-            if(this.status === 'Initial') {
-                return project.status === ProjectStatus.Initial;
-            } else if(this.status === 'Active') {
-                return project.status === ProjectStatus.Active;
-            } else if(this.status === 'Finished') {
-                return project.status === ProjectStatus.Finished;
-            }
-        });
-        return filteredProjects;
+        return projects.filter(project => project.status === this.status);
     }
 
     /**
@@ -117,10 +113,7 @@ export class ProjectsList extends Base<HTMLDivElement> {
     private _handleDrop(event: DragEvent) : void {
         event.preventDefault();
         const projectId = event.dataTransfer!.getData('text/plain');
-        const newStatus = this.element.id === 'initial-projects' && ProjectStatus.Initial ||
-                          this.element.id === 'active-projects' &&  ProjectStatus.Active ||
-                          this.element.id === 'finished-projects' && ProjectStatus.Finished;
-        projectState.changeProjectStatus(projectId, newStatus);
+        projectState.changeProjectStatus(projectId, this.status);
         
     }
 
