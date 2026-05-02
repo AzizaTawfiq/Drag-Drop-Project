@@ -8,6 +8,7 @@ import { projectState } from './../store/ProjectState.js';
 import { Base } from './Base.js';
 import { autoBind } from '../decorators/autoBind.js';
 import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
+import { Popup } from './popup.js';
 export class Project extends Base {
     _project;
     constructor(projectsListId, project) {
@@ -25,23 +26,25 @@ export class Project extends Base {
         desc.textContent = this._project.desc;
     }
     _handleDeleteProject() {
-        if (confirm("Are you sure you want to delete this project?")) {
-            projectState.deleteProject(this._project.id);
-        }
+        Popup.showConfirm('Are you sure you want to delete this project?', () => projectState.deleteProject(this._project.id), { title: 'Delete Project' });
     }
     _handleEditProject() {
-        const titleValue = prompt('Enter project title:', this._project.title);
-        if (titleValue === null)
-            return;
-        const descValue = prompt('Enter project description:', this._project.desc);
-        if (descValue === null)
-            return;
-        const trimmedTitle = titleValue.trim();
-        const trimmedDesc = descValue.trim();
-        if (!this._validateInputsValues(trimmedTitle, trimmedDesc)) {
-            return;
-        }
-        projectState.updateProject(this._project.id, trimmedTitle, trimmedDesc);
+        Popup.showForm('Edit Project', [
+            { name: 'title', label: 'Project Title', value: this._project.title, placeholder: 'Enter project title' },
+            { name: 'desc', label: 'Project Description', value: this._project.desc, placeholder: 'Enter project description' }
+        ], (values) => {
+            const trimmedTitle = (values.title ?? '').trim();
+            const trimmedDesc = (values.desc ?? '').trim();
+            const validationError = this._validateInputsValues(trimmedTitle, trimmedDesc);
+            if (validationError) {
+                return validationError;
+            }
+            projectState.updateProject(this._project.id, trimmedTitle, trimmedDesc);
+        }, {
+            message: 'Update project',
+            confirmText: 'Save',
+            cancelText: 'Cancel'
+        });
     }
     _editProject() {
         const editBtn = this.element.querySelector('.edit');
@@ -54,23 +57,17 @@ export class Project extends Base {
     _validateInputsValues(titleValue, descValue) {
         const [titleInputRule, descInputRule] = assignValidateInputs(titleValue, descValue);
         if (!titleInputRule || !descInputRule) {
-            return false;
+            return 'Invalid project data.';
         }
         const titleErrorMessage = handleValidationErrors(titleInputRule);
         const descErrorMessage = handleValidationErrors(descInputRule);
-        const popupContainer = document.getElementById('popup_container');
-        const descPopup = popupContainer.querySelector('.desc_popup');
         if (titleErrorMessage.length) {
-            descPopup.textContent = titleErrorMessage;
-            popupContainer.classList.add('visible_popup');
-            return false;
+            return titleErrorMessage;
         }
         if (descErrorMessage.length) {
-            descPopup.textContent = descErrorMessage;
-            popupContainer.classList.add('visible_popup');
-            return false;
+            return descErrorMessage;
         }
-        return true;
+        return null;
     }
     _runDragging() {
         this.element.addEventListener('dragstart', this._handleDragStart);

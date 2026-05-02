@@ -5,6 +5,7 @@ import type { ProjectStatus } from '../utils/project-status.js';
 import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
 import { Base } from './Base.js';
 import { listState } from '../store/ListState.js';
+import { Popup } from './popup.js';
 export class Fields extends Base<HTMLFormElement> {
     private _listSelect: HTMLSelectElement;
 
@@ -33,7 +34,6 @@ export class Fields extends Base<HTMLFormElement> {
         event.preventDefault();
      const [titleInput, descInput, statusInput ] = this._targetInputs();
       const [titleValue, descValue ] = this._getInputsValues(titleInput!, descInput!);
-      this._validateInputsValues(titleValue, descValue);
       if(this._validateInputsValues(titleValue, descValue)) {
         const payload: ProjectRules = {
             id: Math.random().toString(),
@@ -105,16 +105,12 @@ export class Fields extends Base<HTMLFormElement> {
       const [titleInputRule, descInputRule] = assignValidateInputs(titleValue, descValue); 
       const titleErrorMessage = titleInputRule ? handleValidationErrors(titleInputRule) : '';
       const descErrorMessage = descInputRule ? handleValidationErrors(descInputRule) : ''; 
-      const popupContainer = document.getElementById('popup_container')! as HTMLDivElement; 
-      const descPopup = popupContainer.querySelector('.desc_popup')! as HTMLParagraphElement;
          if(titleErrorMessage.length) {
-            descPopup.textContent = titleErrorMessage;
-            popupContainer.classList.add('visible_popup');
+            Popup.showAlert(titleErrorMessage, 'Validation Error');
             return false;
         }
         else if(descErrorMessage.length) {
-            descPopup.textContent = descErrorMessage;
-            popupContainer.classList.add('visible_popup');
+            Popup.showAlert(descErrorMessage, 'Validation Error');
             return false;
         } 
       

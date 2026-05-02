@@ -16,6 +16,7 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
+    "firebase": "^12.12.1",
     "lite-server": "^2.6.1"
   }
 }

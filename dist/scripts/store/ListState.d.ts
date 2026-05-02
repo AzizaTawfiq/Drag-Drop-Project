@@ -3,6 +3,7 @@ declare class ListState {
     private static _instance;
     private _listeners;
     private _lists;
+    private _sessionId;
     private constructor();
     get lists(): string[];
     static getInstance(): ListState;
@@ -10,7 +11,7 @@ declare class ListState {
     addList(listName: string): void;
     editList(oldName: string, newName: string): void;
     deleteList(listName: string): void;
-    private _updateListeners;
+    private _notifyListeners;
 }
 export declare const listState: ListState;
 export {};

@@ -4,16 +4,13 @@ import type { ProjectRules } from '../store/ProjectRules.js';
 import { Project } from './Project.js';
 import { autoBind } from '../decorators/autoBind.js';
 import { listState } from '../store/ListState.js';
+import { Popup } from './popup.js';
 
 export class ProjectsList extends Base<HTMLDivElement> {
    
     constructor( private status: string) {
         super('projects-list', 'app', false, `${status.toLowerCase().replace(/\s+/g,'-')}-projects`);
         this._renderProjectsList();
-        if(JSON.parse(localStorage.getItem("projects")!)) {
-            const localStorageProjects: ProjectRules[] = JSON.parse(localStorage.getItem("projects")!);
-           this._showProjectInDom(localStorageProjects);
-        }
         projectState.pushListener((projects: ProjectRules[]) => {
          this._showProjectInDom(projects);
         }
@@ -34,16 +31,38 @@ export class ProjectsList extends Base<HTMLDivElement> {
    const deleteBtn = this.element.querySelector('.delete-list') as HTMLButtonElement;
 
    editBtn.addEventListener('click', () => {
-       const newName = prompt('Enter new list name:', this.status);
-       if (newName && newName.trim().length > 0 && newName !== this.status) {
-           listState.editList(this.status, newName.trim());
-       }
+       Popup.showForm(
+           'Edit List',
+           [
+               { name: 'listName', label: 'List Name', value: this.status, placeholder: 'Enter list name' }
+           ],
+           (values) => {
+               const newName = (values.listName ?? '').trim();
+               if (newName.length === 0) {
+                   return 'List name cannot be empty.';
+               }
+               if (newName === this.status) {
+                   return 'Please enter a different list name.';
+               }
+               if (listState.lists.includes(newName)) {
+                   return `A list named '${newName}' already exists.`;
+               }
+               listState.editList(this.status, newName);
+           },
+           {
+               message: 'Change list',
+               confirmText: 'Save',
+               cancelText: 'Cancel'
+           }
+       );
    });
 
    deleteBtn.addEventListener('click', () => {
-       if (confirm(`Are you sure you want to delete the '${this.status}' list and all its projects?`)) {
-           listState.deleteList(this.status);
-       }
+       Popup.showConfirm(
+           `Are you sure you want to delete the '${this.status}' list and all its projects?`,
+           () => listState.deleteList(this.status),
+           { title: 'Delete List' }
+       );
    });
   } 
   

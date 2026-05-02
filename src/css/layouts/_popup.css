@@ -1,33 +1,42 @@
 .popup_container {
   position: fixed;
   inset: 0;
-  background-color: rgba(79, 67, 114, 0.4862745098);
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(3px);
   z-index: 9999;
   place-items: center;
   display: none;
+  padding: 16px;
 }
 .popup_container .popup {
-  min-width: 270px;
-  max-width: 300px;
-  border-radius: 9px;
-  background-color: #f7f7f7;
-  padding: 3px 10px 10px 10px;
+  width: min(460px, 100%);
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.28);
+  padding: 8px 16px 14px;
+  transform: translateY(8px) scale(0.98);
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .popup_container .popup .header {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  border-bottom: 1px solid #ddd;
-  color: rgb(247, 44, 8);
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  border-bottom: 1px solid #eceff3;
+  color: #1f2937;
+  padding-bottom: 8px;
 }
 .popup_container .popup .header .close {
   border-width: 0;
   background-color: initial;
   cursor: pointer;
-  color: #000;
+  color: #334155;
   font-size: 22px;
   position: relative;
   display: -ms-grid;
@@ -35,18 +44,112 @@
   place-items: center;
 }
 .popup_container .popup .header .close:hover {
-  color: rgb(247, 44, 8);
+  color: #0f172a;
 }
 .popup_container .popup .content {
-  padding: 14px 0px;
+  padding: 14px 0 10px;
 }
 .popup_container .popup .content .desc_popup {
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.5;
   width: 100%;
-  color: rgb(247, 44, 8);
+  color: #334155;
+}
+.popup_container .popup .content .desc_popup.desc_popup--error {
+  color: #c81e1e;
+}
+.popup_container .popup .content .popup_form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.popup_container .popup .content .popup_form .popup_form_row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.popup_container .popup .content .popup_form .popup_form_label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+}
+.popup_container .popup .content .popup_form .popup_form_input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 14px;
+  color: #111827;
+}
+.popup_container .popup .content .popup_form .popup_form_input:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.popup_container .popup .popup_actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.popup_container .popup .popup_actions button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    background-color 0.15s ease;
+}
+.popup_container .popup .popup_actions button:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.97);
+}
+.popup_container .popup .popup_actions button:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.25);
+  outline-offset: 1px;
+}
+.popup_container .popup .popup_actions .cancel-popup-btn {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+.popup_container .popup .popup_actions .confirm-popup-btn {
+  background-color: #2563eb;
+  color: #fff;
+}
+.popup_container .popup .popup_actions .confirm-popup-btn.danger {
+  background-color: #dc2626;
+}
+.popup_container .popup .popup_actions .hidden {
+  display: none;
+}
+.popup_container .popup .hidden {
+  display: none;
+}
+
+.popup_container .popup.popup--confirm .popup_title {
+  color: #b91c1c;
+}
+.popup_container .popup.popup--confirm .desc_popup {
+  color: #374151;
+}
+.popup_container .popup.popup--alert .popup_title {
+  color: #1d4ed8;
+}
+.popup_container .popup.popup--alert .desc_popup {
+  color: #c81e1e;
+}
+.popup_container .popup.popup--form .popup_title {
+  color: #1f2937;
 }
 
 .visible_popup {
   display: -ms-grid !important;
   display: grid !important;
+}
+.visible_popup .popup {
+  transform: translateY(0) scale(1);
+  opacity: 1;
 }

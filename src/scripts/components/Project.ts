@@ -3,6 +3,7 @@ import type { ProjectRules } from '../store/ProjectRules.js';
 import { Base } from './Base.js';
 import { autoBind } from '../decorators/autoBind.js';
 import { assignValidateInputs, handleValidationErrors } from '../utils/validation/validation_helpers.js';
+import { Popup } from './popup.js';
 export class Project extends Base<HTMLDivElement> {
     private _project: ProjectRules;
     constructor(projectsListId:string,project:ProjectRules) {
@@ -30,27 +31,38 @@ export class Project extends Base<HTMLDivElement> {
      @autoBind
 
     private _handleDeleteProject() : void {
-        if (confirm("Are you sure you want to delete this project?")) {
-        projectState.deleteProject(this._project.id);
-        }
+        Popup.showConfirm(
+            'Are you sure you want to delete this project?',
+            () => projectState.deleteProject(this._project.id),
+            { title: 'Delete Project' }
+        );
     }
 
     @autoBind
     private _handleEditProject() : void {
-        const titleValue = prompt('Enter project title:', this._project.title);
-        if (titleValue === null) return;
+        Popup.showForm(
+            'Edit Project',
+            [
+                { name: 'title', label: 'Project Title', value: this._project.title, placeholder: 'Enter project title' },
+                { name: 'desc', label: 'Project Description', value: this._project.desc, placeholder: 'Enter project description' }
+            ],
+            (values) => {
+                const trimmedTitle = (values.title ?? '').trim();
+                const trimmedDesc = (values.desc ?? '').trim();
+                const validationError = this._validateInputsValues(trimmedTitle, trimmedDesc);
 
-        const descValue = prompt('Enter project description:', this._project.desc);
-        if (descValue === null) return;
+                if (validationError) {
+                    return validationError;
+                }
 
-        const trimmedTitle = titleValue.trim();
-        const trimmedDesc = descValue.trim();
-
-        if (!this._validateInputsValues(trimmedTitle, trimmedDesc)) {
-            return;
-        }
-
-        projectState.updateProject(this._project.id, trimmedTitle, trimmedDesc);
+                projectState.updateProject(this._project.id, trimmedTitle, trimmedDesc);
+            },
+            {
+                message: 'Update project',
+                confirmText: 'Save',
+                cancelText: 'Cancel'
+            }
+        );
     }
 
     /**
@@ -66,29 +78,22 @@ export class Project extends Base<HTMLDivElement> {
         deleteBtn.addEventListener('click', this._handleDeleteProject);
 }
 
-private _validateInputsValues(titleValue: string, descValue: string) : boolean {
+private _validateInputsValues(titleValue: string, descValue: string) : string | null {
     const [titleInputRule, descInputRule] = assignValidateInputs(titleValue, descValue);
     if (!titleInputRule || !descInputRule) {
-        return false;
+        return 'Invalid project data.';
     }
     const titleErrorMessage = handleValidationErrors(titleInputRule);
     const descErrorMessage = handleValidationErrors(descInputRule);
-    const popupContainer = document.getElementById('popup_container')! as HTMLDivElement;
-    const descPopup = popupContainer.querySelector('.desc_popup')! as HTMLParagraphElement;
-
     if (titleErrorMessage.length) {
-        descPopup.textContent = titleErrorMessage;
-        popupContainer.classList.add('visible_popup');
-        return false;
+        return titleErrorMessage;
     }
 
     if (descErrorMessage.length) {
-        descPopup.textContent = descErrorMessage;
-        popupContainer.classList.add('visible_popup');
-        return false;
+        return descErrorMessage;
     }
 
-    return true;
+    return null;
 }
 /**
  * @desc Attaches event listeners for drag-and-drop functionality, enabling the project item to be draggable and allowing users to move it between different project lists.

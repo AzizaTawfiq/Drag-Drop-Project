@@ -1,14 +1,19 @@
+import { db } from '../firebase/config.js';
+import { collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { getSessionId } from '../utils/session.js';
 class ProjectState {
     static _instance;
     _listeners = [];
     _projects = [];
-    _localStorageProjects = localStorage.getItem("projects")
-        ? JSON.parse(localStorage.getItem("projects"))
-        : [];
+    _sessionId;
     constructor() {
-        this._projects = this._localStorageProjects;
+        this._sessionId = getSessionId();
+        const projectsCol = collection(db, 'sessions', this._sessionId, 'projects');
+        onSnapshot(projectsCol, (snapshot) => {
+            this._projects = snapshot.docs.map(d => d.data());
+            this._runListeners();
+        });
     }
-    ;
     static getInstance() {
         if (!this._instance) {
             this._instance = new ProjectState();
@@ -18,59 +23,39 @@ class ProjectState {
     }
     pushListener(listener) {
         this._listeners.push(listener);
+        listener(this._projects.slice());
     }
     createProject(data) {
-        this._projects.push(data);
-        this._runListeners();
-        localStorage.setItem("projects", JSON.stringify(this._projects));
+        const projectDoc = doc(db, 'sessions', this._sessionId, 'projects', data.id);
+        setDoc(projectDoc, data);
     }
     deleteProject(projectId) {
-        const projectsAfterDelete = this._projects.filter((project) => project.id !== projectId);
-        this._projects = projectsAfterDelete;
-        this._runListeners();
-        localStorage.setItem("projects", JSON.stringify(this._projects));
+        deleteDoc(doc(db, 'sessions', this._sessionId, 'projects', projectId));
     }
     updateProject(projectId, title, desc) {
-        const project = this._projects.find((item) => item.id === projectId);
-        if (!project)
-            return;
-        project.title = title;
-        project.desc = desc;
-        this._runListeners();
-        localStorage.setItem("projects", JSON.stringify(this._projects));
+        updateDoc(doc(db, 'sessions', this._sessionId, 'projects', projectId), { title, desc });
+    }
+    changeProjectStatus(projectId, newStatus) {
+        const project = this._projects.find(p => p.id === projectId);
+        if (project && project.status !== newStatus) {
+            updateDoc(doc(db, 'sessions', this._sessionId, 'projects', projectId), { status: newStatus });
+        }
+    }
+    renameStatus(oldStatus, newStatus) {
+        const affected = this._projects.filter(p => p.status === oldStatus);
+        for (const p of affected) {
+            updateDoc(doc(db, 'sessions', this._sessionId, 'projects', p.id), { status: newStatus });
+        }
+    }
+    deleteProjectsByStatus(status) {
+        const affected = this._projects.filter(p => p.status === status);
+        for (const p of affected) {
+            deleteDoc(doc(db, 'sessions', this._sessionId, 'projects', p.id));
+        }
     }
     _runListeners() {
         for (const listener of this._listeners) {
             listener(this._projects.slice());
-        }
-    }
-    changeProjectStatus(projectId, newStatus) {
-        const project = this._projects.find((project) => project.id === projectId);
-        if (project && project.status !== newStatus) {
-            project.status = newStatus;
-            this._runListeners();
-            localStorage.setItem("projects", JSON.stringify(this._projects));
-        }
-    }
-    renameStatus(oldStatus, newStatus) {
-        let changed = false;
-        for (const p of this._projects) {
-            if (p.status === oldStatus) {
-                p.status = newStatus;
-                changed = true;
-            }
-        }
-        if (changed) {
-            this._runListeners();
-            localStorage.setItem("projects", JSON.stringify(this._projects));
-        }
-    }
-    deleteProjectsByStatus(status) {
-        const originalLength = this._projects.length;
-        this._projects = this._projects.filter(p => p.status !== status);
-        if (this._projects.length !== originalLength) {
-            this._runListeners();
-            localStorage.setItem("projects", JSON.stringify(this._projects));
         }
     }
 }

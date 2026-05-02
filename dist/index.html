@@ -9,6 +9,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./main.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+        }
+      }
+    </script>
     <script type="module" src="./scripts/index.js"></script>
     <title>Drag and Drop</title>
   </head>
@@ -91,18 +99,20 @@
       <div class="popup_container" id="popup_container">
         <div class="popup">
           <div class="header">
-            <h4>Alert</h4>
+            <h4 class="popup_title">Alert</h4>
             <button class="close">
               <i class="bx bx-x"></i>
             </button>
           </div>
           <div class="content">
-            <p class="desc_popup">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eius
-              culpa animi cupiditate nesciunt laboriosam illum quas consectetur
-              veniam! Sapiente ullam facilis voluptates blanditiis nesciunt
-              dicta architecto odit quia incidunt magni.
-            </p>
+            <p class="desc_popup"></p>
+            <div class="popup_form hidden"></div>
+          </div>
+          <div class="popup_actions">
+            <button class="cancel-popup-btn hidden" type="button">
+              Cancel
+            </button>
+            <button class="confirm-popup-btn" type="button">OK</button>
           </div>
         </div>
       </div>
